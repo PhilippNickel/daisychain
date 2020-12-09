@@ -1,0 +1,4 @@
+*.svf
+work/**
+transcript
+vsim.*
