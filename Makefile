@@ -11,3 +11,4 @@ sim_shift_reg:
 	vlog -sv -timescale 1ns/1ps dff.sv register_cell.sv shift_register.sv
 	vlog -sv -timescale 1ns/1ps testbench_shift_reg.sv
 	vsim -voptargs="+acc" testbench_shift_reg
+
