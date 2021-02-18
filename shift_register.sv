@@ -1,4 +1,5 @@
 
+
 `include "includes.svh"
 /* shift register consisting of `DATA_LEN register_cells with data in and data out port */
 module shift_register
@@ -19,7 +20,7 @@ assign clk_and_en = clk & enable;
 
 generate
     genvar i;
-    for (i = `DATA_LEN - 1; i >= 0; i--) begin
+    for (i = `DATA_LEN - 1; i >= 0; i--) begin : chain_begin
         /* beginning of the chain */
         if (i == `DATA_LEN - 1) begin
             register_cell cell_reg(
@@ -32,7 +33,7 @@ generate
             );
         end
         /* end of the chain */
-        else if (i == 0) begin
+        else if (i == 0) begin : chain_end
             register_cell cell_reg(
                 .chain_in(cells_out[i+1]),
                 .update(update),
@@ -43,7 +44,7 @@ generate
             );
         end
         /* middle cells */
-        else begin
+        else begin : chain_middle
             register_cell cell_reg(
                 .chain_in(cells_out[i+1]),
                 .update(update),

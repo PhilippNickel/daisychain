@@ -20,7 +20,7 @@ timeunit 1ns/1ps;
     logic [`DATA_LEN - 1 : 0]test_data_out;
 
     assign data_out_dut = data_inout_dut;
-    assign test_data = '1;
+    assign test_data = 8'h08;
     assign data_inout_dut = (bidir_write_to_dut == 1'b1) ? data_in_dut : 1'bZ;
     
     task switch_to_write();
@@ -69,7 +69,7 @@ timeunit 1ns/1ps;
     endtask
 
     task automatic receive_data(ref logic [`DATA_LEN - 1 : 0]data);
-        for(int i = `DATA_LEN - 1; i >= 0; i--) begin
+        for(int i = 0; i < `DATA_LEN; i++) begin
             @(negedge clk);
             data[i] = data_inout_dut; 
             $display("got data bit %b at %0t", data[i], $time);
@@ -102,7 +102,7 @@ timeunit 1ns/1ps;
         wait_n_clk_cycles(1);
         assert (ser_ctrl_dut.curr_state == RCV_DATA_ST) else $error("fehler receive at %0t", $time);
         send_data(test_data);
-        wait_n_clk_cycles(1);
+        wait_n_clk_cycles(3);
         send_startbit();
         send_command(UPDATE_CMD);
         wait_n_clk_cycles(3);
@@ -110,10 +110,12 @@ timeunit 1ns/1ps;
         wait_n_clk_cycles(1);
         send_startbit();
         send_command(START_SND_CMD);
-        switch_to_read();
         wait_n_clk_cycles(2);
+        
+        switch_to_read();
         assert (ser_ctrl_dut.curr_state == SND_DATA_ST) else $error("fehler update at %0t", $time);
         receive_data(test_data_out);
+        switch_to_write();
         assert (test_data == test_data_out) else $error("datenlesefehler! erwartet: %b bekommen: %b", test_data, test_data_out);
     end
 

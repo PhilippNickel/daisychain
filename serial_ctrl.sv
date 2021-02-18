@@ -2,7 +2,7 @@
 
 module serial_ctrl
 #(
-  parameter BIT_COUNT_LEN = $clog2(`DATA_LEN) /* to scale the bit count variable size to the data length*/
+  parameter BIT_COUNT_LEN = $clog2(`DATA_LEN + 1) /* to scale the bit count variable size to the data length*/
 )
 (
   inout logic data_inout,
@@ -41,16 +41,7 @@ module serial_ctrl
     .enable(en_shift_reg),
     .data_out(data_out_shift_reg),
     .bit_out(bit_out)
-  );
-
-  /* sends a char over the data_inout port */
-  function void send_char(logic[`ASCII_LEN-1:0] char);  
-    bidir_write <= 1;
-    for (int i = `ASCII_LEN-1; i >= 0; i--) begin
-      data_inout_reg = char[i];
-    end
-    bidir_write = 0;
-  endfunction
+  ); 
   
   /* combinational state machine to select next state */
   always_comb begin
@@ -140,10 +131,10 @@ module serial_ctrl
         /* todo send ! */
       end
       RCV_DATA_ST: begin
-        if (bit_count < `DATA_LEN) begin
+        if (bit_count < `DATA_LEN + 1) begin
           en_shift_reg <= 1;
           data_in_shift_reg <= data_inout;
-          bit_count<= bit_count+1;
+          bit_count <= bit_count+1;
         end
         else begin
           rcv_done <= 1;
