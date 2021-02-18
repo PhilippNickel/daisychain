@@ -20,7 +20,7 @@ timeunit 1ns/1ps;
     logic [`DATA_LEN - 1 : 0]test_data_out;
 
     assign data_out_dut = data_inout_dut;
-    assign test_data = 8'h08;
+    assign test_data = 8'h48;
     assign data_inout_dut = (bidir_write_to_dut == 1'b1) ? data_in_dut : 1'bZ;
     
     task switch_to_write();
@@ -69,7 +69,7 @@ timeunit 1ns/1ps;
     endtask
 
     task automatic receive_data(ref logic [`DATA_LEN - 1 : 0]data);
-        for(int i = 0; i < `DATA_LEN; i++) begin
+        for(int i = `DATA_LEN - 1; i >= 0; i--) begin
             @(negedge clk);
             data[i] = data_inout_dut; 
             $display("got data bit %b at %0t", data[i], $time);
