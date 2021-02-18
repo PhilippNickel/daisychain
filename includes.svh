@@ -1,10 +1,10 @@
-`ifndef _INCLUDES_SVH
-  `define _INCLUDES_SVH
+`ifndef _INCLUDES_SVH_
+  `define _INCLUDES_SVH_
   `define CMD_LEN 2 /* length of the commands in bits */
   `define DATA_LEN 8 /* length of the possible to be stored data */
   `define ASCII_LEN 8 /* length of an ASCII character in bitss */
 
-  typedef enum bit [2:0] {
+  typedef enum int unsigned {
     RESET_ST,
     UPDATE_ST,
     IDLE_ST,

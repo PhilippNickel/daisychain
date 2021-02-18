@@ -2,12 +2,16 @@
 
 module serial_ctrl
 #(
-  parameter BIT_COUNT_LEN = $clog2(`DATA_LEN) /* to scale the bit count variable size to the data length*/
+  parameter BIT_COUNT_LEN = $clog2(`DATA_LEN+1) /* to scale the bit count variable size to the data length */
 )
 (
   inout logic data_inout,
   input logic clk,
-  output logic [`DATA_LEN - 1 : 0]bit_out
+  output logic [`DATA_LEN - 1 : 0]bit_out,
+  output wire [2 : 0]curr_state_debug,
+  output wire [2 : 0]next_state_debug,
+  
+  output wire bidir_write_debug
 );
 
   logic bidir_write; /* flag 0: reading from data_inout, 1: writing to data_inout */
@@ -31,7 +35,15 @@ module serial_ctrl
   logic en_shift_reg;
   logic data_in_shift_reg;
   logic data_out_shift_reg;
-
+  
+  /* debug ports */
+  
+	assign next_state_debug = next_state;
+	assign curr_state_debug = curr_state;
+	assign bidir_write_debug = en_shift_reg;
+	
+  /* end of debug ports */
+ 
   /* shift register to save the incoming data */
   shift_register daisychain (
     .clk(clk),
@@ -43,17 +55,8 @@ module serial_ctrl
     .bit_out(bit_out)
   );
 
-  /* sends a char over the data_inout port */
-  function void send_char(logic[`ASCII_LEN-1:0] char);  
-    bidir_write <= 1;
-    for (int i = `ASCII_LEN-1; i >= 0; i--) begin
-      data_inout_reg = char[i];
-    end
-    bidir_write = 0;
-  endfunction
-  
   /* combinational state machine to select next state */
-  always_comb begin
+  always_comb begin : next_state_logic
     next_state = ctrl_state_t'('X); /* to spot errors during simulation */
     case (curr_state)
       IDLE_ST : begin
@@ -68,6 +71,7 @@ module serial_ctrl
         end
       end
       ACK_CMD_ST : begin
+		if(cmd_rcv_done) begin
         case (cmd_reg)
           START_SND_CMD: begin
             next_state = SND_DATA_ST;
@@ -82,6 +86,7 @@ module serial_ctrl
             next_state = UPDATE_ST;
           end
         endcase
+		  end
       end
       SND_DATA_ST: begin
         if (send_done) begin
@@ -116,7 +121,7 @@ module serial_ctrl
     reset_shift_reg <= 1;
     bidir_write <= 0;
     rcv_done <= 0;
-    send_done <= 0; 
+    send_done <= 0;
     case (next_state)
       RESET_ST: begin
         en_shift_reg <= 1;
@@ -127,7 +132,7 @@ module serial_ctrl
       end
       RCV_CMD_ST: begin
         if (bit_count < `CMD_LEN) begin
-          bit_count<= bit_count + 1;
+          bit_count <= bit_count + 1;
           cmd_reg <= (cmd_reg << 1) | data_inout; /* save incoming bit into command register */
           cmd_rcv_done <= 0;
         end 
@@ -140,7 +145,7 @@ module serial_ctrl
         /* todo send ! */
       end
       RCV_DATA_ST: begin
-        if (bit_count < `DATA_LEN) begin
+        if (bit_count <= `DATA_LEN) begin
           en_shift_reg <= 1;
           data_in_shift_reg <= data_inout;
           bit_count<= bit_count+1;
@@ -155,8 +160,7 @@ module serial_ctrl
           bidir_write <= 1;
           en_shift_reg <= 1;
           data_inout_reg <= data_out_shift_reg;
-          bit_count<= bit_count+1;
-          
+          bit_count <= bit_count+1;
         end
         else begin
           send_done <= 1;
@@ -172,7 +176,7 @@ module serial_ctrl
   /* switch to next state with each clock */
   always_ff @ (posedge clk) begin
     /* recognition of startbit */
-    got_start_bit <= 0; 
+    	 got_start_bit <= 0; 
     if (curr_state == IDLE_ST) begin
       if(data_inout == 1) begin
         got_start_bit <= 1;
