@@ -2,7 +2,7 @@
 
 module serial_ctrl
 #(
-  parameter BIT_COUNT_LEN = $clog2(`DATA_LEN+1) /* to scale the bit count variable size to the data length */
+  parameter BIT_COUNT_LEN = $clog2(`DATA_LEN + 1) /* to scale the bit count variable size to the data length*/
 )
 (
   inout logic data_inout,
@@ -148,7 +148,7 @@ module serial_ctrl
         if (bit_count <= `DATA_LEN) begin
           en_shift_reg <= 1;
           data_in_shift_reg <= data_inout;
-          bit_count<= bit_count+1;
+          bit_count <= bit_count+1;
         end
         else begin
           rcv_done <= 1;
