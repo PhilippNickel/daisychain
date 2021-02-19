@@ -1,4 +1,4 @@
-SRC+=dff.sv 
+SRC+=dflipflop.sv 
 SRC+=register_cell.sv 
 SRC+=shift_register.sv 
 SRC+=serial_ctrl.sv 
