@@ -6,7 +6,7 @@ SRC_TB+=testbench.sv
 sim_all:	
 	vlog -sv -timescale 1ns/1ps $(SRC)
 	vlog -sv -timescale 1ns/1ps $(SRC_TB) 
-	vsim  -voptargs="+acc" testbench 
+	vsim  -voptargs="+acc -fsmdebug" testbench 
 sim_shift_reg: 
 	vlog -sv -timescale 1ns/1ps dff.sv register_cell.sv shift_register.sv
 	vlog -sv -timescale 1ns/1ps testbench_shift_reg.sv

@@ -7,11 +7,13 @@ module serial_ctrl
 (
   inout logic data_inout,
   input logic clk,
-  output logic [`DATA_LEN - 1 : 0]bit_out,
+  output logic [`DATA_LEN - 1 : 0]bit_out
+/*
   output wire [2 : 0]curr_state_debug,
   output wire [2 : 0]next_state_debug,
   
   output wire bidir_write_debug
+*/
 );
 
   logic bidir_write; /* flag 0: reading from data_inout, 1: writing to data_inout */
@@ -145,7 +147,7 @@ module serial_ctrl
         /* todo send ! */
       end
       RCV_DATA_ST: begin
-        if (bit_count <= `DATA_LEN) begin
+        if (bit_count < `DATA_LEN) begin
           en_shift_reg <= 1;
           data_in_shift_reg <= data_inout;
           bit_count <= bit_count+1;
@@ -156,7 +158,7 @@ module serial_ctrl
         end
       end
       SND_DATA_ST: begin
-        if (bit_count < `DATA_LEN) begin
+        if (bit_count <= `DATA_LEN + 1) begin
           bidir_write <= 1;
           en_shift_reg <= 1;
           data_inout_reg <= data_out_shift_reg;
