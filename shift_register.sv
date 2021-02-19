@@ -15,7 +15,7 @@ module shift_register
 
 logic cells_out[`DATA_LEN - 1 : 0];
 
-assign cells_out[0] = data_out;
+assign data_out = cells_out[0];
 
 generate
     genvar i;
