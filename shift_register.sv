@@ -15,6 +15,8 @@ module shift_register
 
 logic cells_out[`DATA_LEN - 1 : 0];
 
+assign cells_out[0] = data_out;
+
 generate
     genvar i;
     for (i = `DATA_LEN - 1; i >= 0; i--) begin : chain_generate
@@ -30,20 +32,8 @@ generate
                 .bit_out(bit_out[i])
             );
         end
-        /* end of the chain */
-        else if (i == 0) begin : chain_end
-            register_cell cell_reg(
-                .chain_in(cells_out[i+1]),
-                .update(update),
-                .clk(clk),
-					 .enable(enable),
-                .reset(reset),
-                .chain_out(data_out),
-                .bit_out(bit_out[i])
-            );
-        end
-        /* middle cells */
-        else begin : chain_middle
+        /* middle and end cells */
+        else begin : chain_middle_and_end
             register_cell cell_reg(
                 .chain_in(cells_out[i+1]),
                 .update(update),
