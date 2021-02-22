@@ -4,7 +4,7 @@
   `define DATA_LEN 8 /* length of the possible to be stored data */
   `define ASCII_LEN 8 /* length of an ASCII character in bitss */
 
-  typedef enum int unsigned {
+  typedef enum bit [2:0] {
     RESET_ST,
     UPDATE_ST,
     IDLE_ST,
@@ -14,7 +14,7 @@
     SND_DATA_ST  /* sending data */
   } ctrl_state_t;  /* fsm states for the daisychain controller to be in */
 
-  typedef enum bit [`CMD_LEN-1:0]{
+  typedef enum bit [`CMD_LEN-1:0] {
     RESET_CMD,
     START_SND_CMD,  /* start transmission of saved data */
     START_RCV_CMD,  /* start receiving of data */
