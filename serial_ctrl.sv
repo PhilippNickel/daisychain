@@ -124,6 +124,7 @@ module serial_ctrl
     bidir_write <= 0;
     rcv_done <= 0;
     send_done <= 0;
+    got_start_bit <= 0;
     case (next_state)
       RESET_ST: begin
         en_shift_reg <= 1;
@@ -170,20 +171,16 @@ module serial_ctrl
         end
       end
       default : begin
-         /* dont change anything, IDLE state */
+        /* recognition of startbit */
+        if(data_inout == 1) begin
+          got_start_bit <= 1;
+        end
       end
     endcase
   end
     
   /* switch to next state with each clock */
   always_ff @ (posedge clk) begin
-    /* recognition of startbit */
-    	 got_start_bit <= 0; 
-    if (curr_state == IDLE_ST) begin
-      if(data_inout == 1) begin
-        got_start_bit <= 1;
-      end
-    end
     curr_state <= next_state;
   end
 endmodule
