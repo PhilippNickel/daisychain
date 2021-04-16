@@ -2,7 +2,7 @@
 module dflipflop (
     input  logic clk,
     input  logic d,
-	 input	logic en,
+    input  logic en,
     input  logic reset_n,
     output logic q
 );

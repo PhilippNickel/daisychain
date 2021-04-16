@@ -40,9 +40,9 @@ module serial_ctrl
   
   /* debug ports */
   
-	assign next_state_debug = next_state;
-	assign curr_state_debug = curr_state;
-	assign bidir_write_debug = en_shift_reg;
+	//assign next_state_debug = next_state;
+	//assign curr_state_debug = curr_state;
+	//assign bidir_write_debug = en_shift_reg;
 	
   /* end of debug ports */
  
